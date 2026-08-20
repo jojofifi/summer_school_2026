@@ -10,7 +10,8 @@ pygame.init()
 display = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 FPS = 90
-midi = pm.PrettyMIDI("src\\Ecossaise_Beethoven.midi")
+midi_path = "src\\Pirates of the Caribbean - He's a Pirate (3).mid"
+midi = pm.PrettyMIDI(midi_path)
 
 Color = {
     0 : (255,0,0),     # rouge
@@ -123,13 +124,13 @@ def drawCircle(precision,x,y,rayon,color):
         
 def game():
     pygame.mixer.init()
-    pygame.mixer.music.load("src\\Ecossaise_Beethoven.midi")
+    pygame.mixer.music.load(midi_path)
     pygame.mixer.music.play()
     t0 = time.time()
     all_notes = defaultdict(list)
     fireworks = []
     streaks = []
-    flight_time = 0.4
+    flight_time = 0.5
 
     all_notes = []
     all_pitch = []
@@ -156,7 +157,7 @@ def game():
         firework_per_frame = 0
         if not pygame.mixer.music.get_busy() and note_number >= len(all_notes):
             break
-        realtime = pygame.mixer.music.get_pos()/1000 -0.635
+        realtime = pygame.mixer.music.get_pos()/1000 -0.3
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -164,7 +165,7 @@ def game():
             pass
 
         while note_number < len(all_notes) and all_notes[note_number]<= realtime and firework_per_frame <= 4:
-            fireworks.append(Firework(flight_time, all_pitch[note_number],all_duration[note_number]*130))
+            fireworks.append(Firework(flight_time-0.1, all_pitch[note_number],all_duration[note_number]*130))
             note_number +=1
             firework_per_frame +=1
     
