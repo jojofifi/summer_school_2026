@@ -2,12 +2,15 @@
 import pygame
 import random
 import math
-
+import pretty_midi as pm
+from collections import defaultdict
+import time
 pygame.init()
 
 display = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 FPS = 90
+midi = pm.PrettyMIDI("src\\Ecossaise_Beethoven.midi")
 
 Color = {
     0 : (255,0,0),     # rouge
@@ -21,8 +24,7 @@ Color = {
     8 : (127,0,255),   # violet
     9 : (255,0,255),   # rose
     10 : (255,0,127),  # magenta
-    11 : (255,255,255),# blanc
-    12 : (178,102,255),# mauve
+    11 : (178,102,255),# mauve
 }
 
 def choose_random_color():
@@ -31,11 +33,11 @@ def choose_random_color():
     b = random.randint(0, 255)
     return r, g, b
 def get_color_from_note(note):
-    valeur = note%13
+    valeur = note%12
     couleur = Color[int(valeur)]
     return couleur
 class Streak():
-    def __init__(self, x, y,type,note):
+    def __init__(self, x, y,type,note,end_time):
         self.color = get_color_from_note(note)
         self.type = 1
         self.x = x
@@ -48,6 +50,7 @@ class Streak():
         self.vy = -velocity_mag*math.sin(math.radians(self.angle)) #velocity y
         self.timer = 0
         self.ended = False
+        self.end_time = end_time
 
     def get_angle(self):
         return math.atan2(-self.vy, self.vx)
@@ -58,7 +61,7 @@ class Streak():
         self.x += self.vx
         self.y += self.vy
         self.timer += 1
-        if self.timer >= 180:
+        if self.timer >= self.end_time:
             self.ended = True
         
     def drawtriangle(self):
@@ -76,7 +79,7 @@ class Streak():
     
 
 class Firework():
-    def __init__(self,time,note):
+    def __init__(self,time,note,streak_end):
         self.x = random.randint(0, 1000)
         self.y = 500
         self.distance = 400
@@ -86,7 +89,7 @@ class Firework():
         self.acceleration = (2*self.distance)/math.pow(self.time,2)
         self.initiale = 2*self.distance/self.time
         self.note = note
-       
+        self.streak_end = streak_end
 
 
     def move(self):
@@ -119,22 +122,59 @@ def drawCircle(precision,x,y,rayon,color):
     
         
 def game():
-    fireworks = [Firework(0.5,random.uniform(1,127))]
+    pygame.mixer.init()
+    pygame.mixer.music.load("src\\Ecossaise_Beethoven.midi")
+    pygame.mixer.music.play()
+    t0 = time.time()
+    all_notes = defaultdict(list)
+    fireworks = []
     streaks = []
+    flight_time = 0.4
+
+    all_notes = []
+    all_pitch = []
+    all_duration = []
+    for instrument in midi.instruments:
+        for note in instrument.notes:
+            all_notes.append(note.start-flight_time)
+            all_pitch.append(note.pitch)
+            all_duration.append(note.end-note.start)
+
+    combined = sorted(zip(all_notes,all_pitch,all_duration))
+    all_notes = [t for t, p, d in combined] 
+    all_pitch = [p for t, p, d in combined]
+    all_duration = [d for t, p, d in combined]
+    note_number = 0
+
+    first_note_time = min(note.start for instrument in midi.instruments for note in instrument.notes)
+    print(f"Premiere note a  {first_note_time}")
+
+    Max_streak = 500 
+    
+
     while True:
+        firework_per_frame = 0
+        if not pygame.mixer.music.get_busy() and note_number >= len(all_notes):
+            break
+        realtime = pygame.mixer.music.get_pos()/1000 -0.635
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-    
-        if random.uniform(0, 1) <= 1/60:
-            fireworks.append(Firework(0.5,random.uniform(1,127)))
+        while pygame.mixer.music.get_pos()<0:
+            pass
+
+        while note_number < len(all_notes) and all_notes[note_number]<= realtime and firework_per_frame <= 4:
+            fireworks.append(Firework(flight_time, all_pitch[note_number],all_duration[note_number]*130))
+            note_number +=1
+            firework_per_frame +=1
     
         display.fill((0, 0, 0))
         for firework in fireworks:
             firework.move()
             firework.draw()
             if firework.ended:
-                streaks += [Streak(firework.x, firework.y,1,firework.note) for i in range(random.randint(20, 40))]
+                if len(streaks) < Max_streak:
+                    streaks += [Streak(firework.x, firework.y,1,firework.note,firework.streak_end) for i in range(random.randint(20, 40))]
                 fireworks.remove(firework)
         for streak in streaks:
             streak.move()
