@@ -1,6 +1,7 @@
 import librosa
 import numpy as np
 import matplotlib.pyplot as plt
+
 from tools.onset import Onset
 
 class Note:
@@ -49,11 +50,41 @@ class Note:
                 if(idx != 0):
                     cqt_slice_copy[idx-1] = 0
 
+                print(Note.getNoteEnd(cqt, sr, hop_length, t_sec, idx))
+
             if (len(max_values) != 0):
                 print(str(t_sec) + ": " + librosa.midi_to_note(max_values))
                 onsets_notes.append(max_values)
 
+
         return onsets_notes
+
+    @staticmethod
+    def getNoteEnd(cqt, sr, hop_length: int, time, idx):
+        endFound = False
+        isGoingDown = False
+        count = 0
+        highest = 0
+        frame = librosa.time_to_frames(time, sr=sr, hop_length=hop_length)
+
+        while(not endFound):
+            cqt_slice = Note.getCqtAtFrame(cqt, (frame+count))
+            if(cqt_slice[idx] > highest):
+                highest = cqt_slice[idx]
+            else:
+                isGoingDown = True
+
+            if(isGoingDown):
+                percentDif = 100-cqt_slice[idx]*100/highest
+                if(percentDif>60):
+                    endFound = True
+            count += 1
+
+        return time
+
+
+
+
 
 
     @staticmethod
@@ -61,7 +92,11 @@ class Note:
         cqt_times = librosa.times_like(cqt, sr=sr, hop_length=hop_length)
         col_idx = np.argmin(np.abs(cqt_times - t))
         spectrum_at_t = np.abs(cqt[:, col_idx])
+        return spectrum_at_t
 
+    @staticmethod
+    def getCqtAtFrame(cqt, col_idx):
+        spectrum_at_t = np.abs(cqt[:, col_idx])
         return spectrum_at_t
 
     @staticmethod
