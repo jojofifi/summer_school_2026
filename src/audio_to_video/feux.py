@@ -10,7 +10,7 @@ pygame.init()
 display = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 FPS = 90
-midi_path = "src\\Pirates of the Caribbean - He's a Pirate (3).mid"
+midi_path = "src\\Ecossaise_Beethoven.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 Color = {
@@ -53,21 +53,27 @@ class Streak():
         self.ended = False
         self.end_time = end_time
 
+        self.all_point = []
+        self.point_precision = 50
+
     def get_angle(self):
         return math.atan2(-self.vy, self.vx)
 
     def move(self):
         if self.y < 550 :
-            self.vy += 0.01
+           self.vy += 0.01
         self.x += self.vx
         self.y += self.vy
         self.timer += 1
         if self.timer >= self.end_time:
             self.ended = True
-        
+        self.all_point.append((self.x,self.y))
+        if len(self.all_point) > self.point_precision:
+            self.all_point.pop(0)
+
     def drawtriangle(self):
-        rayon = random.uniform(10,15)
         if self.type==1:
+            n = len(self.all_point)
             angle = self.get_angle()
             length = 1
             dx = length*math.cos(angle)
@@ -75,9 +81,14 @@ class Streak():
             a = [int(self.startx), int(self.starty)]
             b = [int(self.x-dx+10), int(self.y+dy)]
             c = [int(self.x-dx-10), int(self.y+dy)]
-            pygame.draw.polygon(display, self.color, (a, b,c))
-            drawCircle(20,self.x,self.y,10,self.color)
-    
+            for i, (px, py) in enumerate(self.all_point):
+                ratio = (i + 1) / n 
+                rayon = 3 * ratio
+                drawCircle(3, px, py, rayon, self.color)
+                i+=5      
+            #pygame.draw.polygon(display, self.color, (a, b,c))    
+            drawCircle(10,self.x,self.y,3,self.color)
+
 
 class Firework():
     def __init__(self,time,note,streak_end):
@@ -170,12 +181,13 @@ def game():
             firework_per_frame +=1
     
         display.fill((0, 0, 0))
+        
         for firework in fireworks:
             firework.move()
             firework.draw()
             if firework.ended:
                 if len(streaks) < Max_streak:
-                    streaks += [Streak(firework.x, firework.y,1,firework.note,firework.streak_end) for i in range(random.randint(20, 40))]
+                    streaks += [Streak(firework.x, firework.y,1,firework.note,firework.streak_end) for i in range(random.randint(30, 50))]
                 fireworks.remove(firework)
         for streak in streaks:
             streak.move()
