@@ -1,5 +1,6 @@
 from feux1 import Firework
 from feux1 import Explosion
+from feux1 import drawcircle
 import pygame
 import random
 
@@ -15,12 +16,13 @@ fireworks = []
 explosions = []
 run = True
 while run:
-
+    
     for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-
+    
     display.fill((0, 0, 0))
+    
     if random.uniform(1,100) <=6:
         fireworks.append(Firework(random.randint(2,10),display,random.randint(1,127),10))
 

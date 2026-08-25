@@ -10,7 +10,7 @@ pygame.init()
 display = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 FPS = 90
-midi_path = "src\\Ecossaise_Beethoven.midi"
+midi_path = "src\\audio_to_video\\media\\PinkPanther.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 Color = {
