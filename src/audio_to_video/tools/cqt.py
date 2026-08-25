@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 class CQT:
     @staticmethod
     def getCQT(y: np.ndarray, sr: number, hop_length: int) -> np.ndarray :
-        return np.abs(librosa.cqt(y, sr=sr, hop_length=hop_length, fmin=librosa.note_to_hz('C1'), n_bins=7*12, bins_per_octave=12))
+        return np.abs(librosa.cqt(y, sr=sr, hop_length=hop_length, fmin=librosa.note_to_hz('C0'), n_bins=7*12, bins_per_octave=12))
 
     def exportCQT(cqt: np.ndarray, sr, exportFilename) -> None :
         fig, ax = plt.subplots()
