@@ -5,32 +5,14 @@ import matplotlib.pyplot as plt
 from tools.onset import Onset
 
 class Note:
-    @staticmethod
-    def getNotes(cqt, onset, sr, hop_length: int) -> None :
-        cqt_times = librosa.times_like(cqt, sr=sr, hop_length=hop_length)
-        freqs = librosa.cqt_frequencies(n_bins=len(cqt), fmin=librosa.note_to_hz("C1"))
-        onset_hz = []
-
-        # for t in onset:
-        #     t_sec = librosa.frames_to_time(t, sr=sr, hop_length=hop_length)
-        #     cqt_at_time = Note.getCqtAtTime(cqt, t_sec, sr, hop_length)
-        #     idx_max = np.argmax(cqt_at_time)
-        #     freq = freqs[idx_max]
-        #
-        #     print(str(t_sec) + ": " + str(freq))
-        #     onset_hz.append(freq)
-
-        t_sec = 56.6
-        cqt_at_time = Note.displayCqtSliceNote(cqt, t_sec, sr, hop_length)
-        idx_max = np.argmax(cqt_at_time)
-        freq = freqs[idx_max]
-
-        print(str(t_sec) + ": " + str(freq))
-        onset_hz.append(freq)
+    def __init__(self, note_midi: int, start_time: float, end_time: float) -> None :
+        self.note_midi = note_midi
+        self.start_time = start_time
+        self.end_time = end_time
 
     @staticmethod
-    def getNotes2(cqt, sound_onset, sr, hop_length: int, n_bins: int, bins_per_octave: int) -> [] :
-        onsets_notes = []
+    def getNotes(cqt, sound_onset, sr, hop_length: int, n_bins: int, bins_per_octave: int) -> [] :
+        notes = []
 
         for t in sound_onset:
             t_sec = librosa.frames_to_time(t, sr=sr, hop_length=hop_length) + 0.1
@@ -41,8 +23,8 @@ class Note:
             for i in range(0, 5):
                 idx = np.argmax(cqt_slice_copy)
                 # if(cqt_slice[idx] >= 1 and idx < librosa.note_to_midi('F4')):
-                if(cqt_slice[idx] >= 0):
-                    max_values.append(idx + 24)
+                if(cqt_slice[idx]):
+                    max_values.append(idx)
                 cqt_slice_copy[idx] = 0
 
                 if(idx != 83):
@@ -50,14 +32,12 @@ class Note:
                 if(idx != 0):
                     cqt_slice_copy[idx-1] = 0
 
-                print(Note.getNoteEnd(cqt, sr, hop_length, t_sec, idx))
+            clean_notes = Note.removeHarmony(cqt_slice, max_values, t_sec)
+            for note in clean_notes :
+                end_time = Note.getNoteEnd(cqt, sr, hop_length, t_sec, note)
+                notes.append(Note(Note.ajustOctave(note, 1), t_sec - 0.12, end_time))
 
-            if (len(max_values) != 0):
-                print(str(t_sec) + ": " + librosa.midi_to_note(max_values))
-                onsets_notes.append(max_values)
-
-
-        return onsets_notes
+        return notes
 
     @staticmethod
     def getNoteEnd(cqt, sr, hop_length: int, time, idx):
@@ -82,10 +62,29 @@ class Note:
 
         return time
 
+    def ajustOctave(note, nbr_octave: int) -> [] :
+        return note + (nbr_octave * 12)
 
+    @staticmethod
+    def removeHarmony(cqt_slice, notes, t_sec) -> [] :
+        notes.sort()
+        if (len(notes) < 1):
+            return []
 
+        final_notes = [notes[0]]
 
+        for note in notes :
+            isNewNote = True
+            for final_note in final_notes :
+                for i in range(1, len(notes) + 8) :
+                    harmony = round(librosa.hz_to_midi(librosa.midi_to_hz(final_note) * i))
 
+                    if (note == harmony) :
+                        isNewNote = False
+            if (isNewNote) :
+                final_notes.append(note)
+
+        return final_notes
 
     @staticmethod
     def getCqtAtTime(cqt, t: float, sr: int, hop_length: int) -> np.ndarray:
