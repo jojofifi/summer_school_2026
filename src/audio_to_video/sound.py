@@ -20,7 +20,6 @@ class Sound:
         CQT.exportCQT(cqt, self.sr, "/home/joseph/Downloads/Trumpet_CQT.png")
         print("\tCQT genereted")
         onset_times = Onset.detectOnset(self.y, self.sr)
-        # onset_times = Onset.detectOnset2(stft)
         print("\tOnset detected")
         notes = Note.getNotes(cqt, onset_times, self.sr, self.hop_length, 12 * 7, 12)
 

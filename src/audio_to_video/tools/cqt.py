@@ -20,9 +20,7 @@ class CQT:
     @staticmethod
     def exportCQT(cqt: np.ndarray, sr, exportFilename) -> None:
         fig, ax = plt.subplots()
-        img = librosa.display.specshow(
-            cqt, vscale="dBFS", sr=sr, x_axis="time", y_axis="cqt_note", ax=ax
-        )
+        img = librosa.display.specshow(cqt, vscale="dBFS", sr=sr, x_axis="time", y_axis="cqt_note", ax=ax)
         ax.set_title("Constant-Q power spectrum")
         librosa.display.colorbar_db(img)
 
