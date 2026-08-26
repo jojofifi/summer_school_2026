@@ -24,6 +24,5 @@ class Sound:
         notes = Note.getNotes(cqt, onset_times, self.sr, self.hop_length, 12*7, 12)
 
         print(exportFilename)
-        print(librosa.frames_to_time(onset_times, sr=self.sr, hop_length=self.hop_length))
         midi = Midi()
         midi.createFile(exportFilename, notes)
