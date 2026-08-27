@@ -9,7 +9,6 @@ class Test():
         self.midiDataTest = pm.PrettyMIDI(midiFileTest)
 
     def compareNbrNotes(self):
-        a = []
         cntCorrect = 0
         for instrument in self.midiDataCorrect.instruments:
             for note in instrument.notes:
@@ -61,6 +60,33 @@ class Test():
         print("wrongly Guessed number of Notes: " + str(countFalse))
         print("Global Percentage difference: " + str(percentage))
 
+    
+    def compareNbrInstrument(self):
+        instruments_correct = {}
+        instruments_test = {}
 
+        for instrument in self.midiDataCorrect.instruments:
+            name = pm.program_to_instrument_name(instrument.program)
+            instruments_correct[name] = len(instrument.notes)
 
+        for instrument in self.midiDataTest.instruments:
+            name = pm.program_to_instrument_name(instrument.program)
+            instruments_test[name] = len(instrument.notes)
 
+        all_instrument_names = set(instruments_correct.keys()) | set(
+            instruments_test.keys()
+        )
+
+        for name in all_instrument_names:
+            cntCorrect = instruments_correct.get(name, 0)
+            cntTest = instruments_test.get(name, 0)
+
+            print(f"Instrument: {name}")
+
+            if cntTest + cntCorrect == 0:
+                percentage = 100
+            else:
+                avg = (cntTest + cntCorrect) / 2
+                percentage = 100 - (abs(cntTest - cntCorrect) / avg * 50)
+
+            print(f"  Similarity: {percentage:.2f}%")
