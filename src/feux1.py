@@ -21,83 +21,153 @@ def get_note_from_pitch(pitch):
     valeur = pitch%12
     return Color[int(valeur)]
 
+def choose_random_color():
+    r = random.randint(0, 255)
+    g = random.randint(0, 255)
+    b = random.randint(0, 255)
+    return r, g, b
+
 class Firework():
-    def __init__(self,time,display,pitch,ended_explosion):
-        self.x = random.uniform(0,1000)
+    def __init__(self,time,display,pitch,ended_explosion,instrument,rise):
+        if rise == "LINEAIRE":
+            self.x = random.uniform(0,1000)
+            self.distance = random.uniform(400,500)
+        else: 
+            self.distance = random.uniform(250,380)
+            if random.uniform(0,1) < 0.5:
+                self.x = random.randint(51, 300)
+                
+            else:
+                self.x = random.randint(700, 899)
         self.y = 500
-        self.distance = 450
+        
         self.time = time
         self.acceleration = 2*self.distance/math.pow(self.time,2)
-        self.initial_speed = self.acceleration*self.time
+        if 0 <= self.x <=500:
+            self.angle = random.randint(60,80)
+        else :
+            self.angle = random.randint(100,120)
+        if rise == "LINEAIRE":
+            self.initial_speed = self.acceleration*self.time
+        else:
+            self.initial_speed = self.acceleration * self.time / math.sin(math.radians(self.angle))
+        
         self.end = False
         self.display = display
         self.timer = 0
         self.color = get_note_from_pitch(pitch)
+        self.color_particule = choose_random_color()
+        self.ended_explosion = ended_explosion
+        self.instrument = instrument
+        self.longueur = 5
+        self.trails = []
+        self.rise = rise
+        self.gravity = 2*self.distance/math.pow(self.time,2)
+        
         
     def move(self):
+        if self.rise =="LINEAIRE":
+            self.speed = self.initial_speed-self.acceleration*self.timer
+            self.y -= self.speed * 1/90
+            if self.speed <= 0:
+                    self.end = True
+        if self.rise == "COURBER":
+            self.speedx = self.initial_speed*math.cos(math.radians(self.angle))
+            self.speedy = (self.gravity)*self.timer+self.initial_speed*-math.sin(math.radians(self.angle))
+            self.x += self.speedx*1/90
+            self.y += self.speedy*1/90
+            if self.speedy >=0 :
+                self.end = True
+        self.trails.insert(0,Trail(self.x,self.y,(255,255,255),self.color_particule,self.display))
+        if(len(self.trails) > 10):
+            del self.trails[len(self.trails) - 1]
+        
+        for trail in self.trails:
+            trail.update(999)
         self.timer += 1/90
-        self.speed = self.initial_speed-self.acceleration*self.timer
-        self.y -= self.speed * 1/90
-        if self.speed <= 0:
-            self.end = True
+        
     def draw(self):
-        a = [self.x,self.y-10]
-        b = [self.x-10,self.y+10]
-        c = [self.x+10,self.y+10]
-        pygame.draw.polygon(self.display,self.color,(a,b,c))
+        drawcircle(self.display,(255,255,255),self.x,self.y,2,10)
+        #a = [self.x,self.y-self.longueur]
+        #b = [self.x-self.longueur,self.y+self.longueur]
+        #c = [self.x+self.longueur,self.y+self.longueur]
+        #pygame.draw.polygon(self.display,(255,255,255),(a,b,c))
+        #draw_rectangle(self.display,(255,255,255),self.x,self.y,self.longueur)
 
 class Explosion():
-    def __init__(self,display,x,y,color,ended_explosion):
+    def __init__(self,display,x,y,color,color_particule,ended_explosion,instrument,rayon):
         self.x = x
         self.y = y
         self.angle = random.uniform(0,360)
-        self.vx = math.cos(math.radians(self.angle))
-        self.vy = -math.sin (math.radians(self.angle))
+        self.vx = math.cos(math.radians(self.angle)) * rayon
+        self.vy = -math.sin (math.radians(self.angle)) * rayon
         self.color = color
+        self.color_particule = color_particule
         self.end_time = ended_explosion
         self.timer = 0
         self.end = False
         self.display = display
         self.trails = []
+        self.instrument = instrument
 
+        
     def move(self):
         if self.y < 550 :
-            self.vy += 0.01
-        self.trails.insert(0,Trail(self.x,self.y,self.timer,self.color,self.display))
-        if(len(self.trails) > 50):
-            del self.trails[len(self.trails) - 1]
-
-        for trail in self.trails:
-            trail.update()
-
+            self.vy += 0.0085
+        if self.instrument =="METEORITE" or self.instrument=="PARTICULE":
+            if self.timer%3==0:
+                self.trails.insert(0,Trail(self.x,self.y,self.color,self.color_particule,self.display))
+            if(len(self.trails) > 30):
+                del self.trails[len(self.trails) - 1]
+            for index, trail in enumerate(self.trails):
+                trail.update(index)
         self.timer += 1
         self.x += self.vx
         self.y += self.vy
-        if self.timer == 90:
+        if self.timer == self.end_time*90:
             self.end = True
     def draw(self):
-        a = [self.x,self.y-10]
-        b = [self.x-10,self.y+10]
-        c = [self.x+10,self.y+10]
-        drawcircle(self.display,self.color,self.x,self.y,5,10)
+        if self.instrument == "METEORITE":
+            drawcircle(self.display,(self.color_particule),self.x,self.y,5,10)
+        elif self.instrument =="ETOILE":
+            draw_star(self.display,self.color,self.x,self.y,5)
+        else:
+            draw_star(self.display,(self.color_particule),self.x,self.y,5)
+            
+            
+            
+        
+
 
 class Trail():
-    def __init__(self,x,y,timer,color,display):
+    def __init__(self,x,y,color,color_particule,display):
         self.x = x
         self.y = y 
-        self.timer = timer
+        self.timer = 0
         self.color = color
         self.display = display
+        self.exist = True
         self.a = [self.x,self.y-3]
         self.b = [self.x-3,self.y+3]
         self.c = [self.x+3,self.y+3]
-        pygame.draw.polygon(self.display,self.color,(self.a,self.b,self.c))
-    def update(self):
-        pygame.draw.polygon(self.display,(0,0,0),(self.a,self.b,self.c))
-        self.a = [self.x,self.a[1]+0.01]
-        self.b = [self.b[0]+0.01,self.b[1]-0.01]
-        self.c = [self.c[0]-0.01,self.c[1]-0.01]
-        pygame.draw.polygon(self.display,self.color,(self.a,self.b,self.c))
+        self.color_particule = color_particule
+        pygame.draw.polygon(self.display,self.color_particule,(self.a,self.b,self.c))
+    def update(self,index):
+        self.timer += 1
+        if self.timer == 40:
+            self.exist=False
+            self.timer = 0
+        if not self.exist:
+            return 
+        self.a = [self.x,self.a[1]+0.05]
+        self.b = [self.b[0]+0.05,self.b[1]-0.05]
+        self.c = [self.c[0]-0.05,self.c[1]-0.05]
+        if index>=5:
+            pygame.draw.polygon(self.display,self.color,(self.a,self.b,self.c))
+        else:
+            pygame.draw.polygon(self.display,self.color_particule,(self.a,self.b,self.c))
+
+
 def drawcircle(display,color,x,y,rayon,nbr_point):
     angle = 360/nbr_point
     new_angle = 0
@@ -108,12 +178,42 @@ def drawcircle(display,color,x,y,rayon,nbr_point):
         futur_point = next_point(center,new_angle,rayon)     
         pygame.draw.polygon(display,color,((center),next1,futur_point))
         next1 = futur_point
+
 def next_point(center,angle,rayon):
     augment_y = math.sin(math.radians(angle))*rayon
     augment_x = math.cos(math.radians(angle))*rayon
     next_point = [int(center[0] + augment_x),int(center[1]-augment_y)]
     return next_point
-    
+
+
+def draw_rectangle(display,color,x,y,longueur):
+    centre = [x,y+longueur*2]
+    point1 = [x-longueur/1.5,y+longueur]
+    point2 = [x+longueur/1.5,y+longueur]
+    point3 = [x+longueur/1.5,y+longueur*4]
+    point4 = [x-longueur/1.5,y+longueur*4]
+    pygame.draw.polygon(display,color,(centre,point1,point2))
+    pygame.draw.polygon(display,color,(centre,point2,point3))
+    pygame.draw.polygon(display,color,(centre,point3,point4))
+    pygame.draw.polygon(display,color,(centre,point4,point1))
+
+
+def draw_star(display,color,x,y,rayon):
+    l1 = [x,y-(rayon/2)]
+    l2 = [x+(rayon/2),y]
+    l3 = [x-(rayon/2),y]
+    l4 = [x,y+(rayon/2)]
+    point1 = [x,y-rayon]
+    point2 = [x+rayon,y]
+    point3 = [x-rayon,y]
+    point4 = [x,y+rayon]
+    pygame.draw.polygon(display,color,(l2,l3,point1))
+    pygame.draw.polygon(display,color,(l1,l4,point2))
+    pygame.draw.polygon(display,color,(l1,l4,point3))
+    pygame.draw.polygon(display,color,(l2,l3,point4))
+
+
+
         
         
 
