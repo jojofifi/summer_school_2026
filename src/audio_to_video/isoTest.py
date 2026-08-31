@@ -1,63 +1,65 @@
 import sys
 import pygame
+import math
+from mountain import Mountain
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-TILE_SIZE = 40
-GRID_SIZE = 10
+TILE_WIDTH = 140
+START_COORDINATES = (0,SCREEN_HEIGHT/2)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
 
-def draw_tile_iso(
-    surface: pygame.Surface,
-    gx: int,
-    gy: int,
-    color: tuple[int, int, int]
-) -> None:
-    iso_x, iso_y = grid_to_iso(gx, gy)
+class Tiles:
+    def __init__(self, start:tuple[float,float], screen:pygame.Surface) -> None:
+        self.type = type
+        self.start = start
+        self.screen = screen
 
-    # Center the grid on screen
-    cx = iso_x + SCREEN_WIDTH // 2
-    cy = iso_y + 200
+    def fillBottomScreen(self):
+        tiles = []
+        for i in range(0,math.ceil(SCREEN_HEIGHT/(TILE_WIDTH/4))):
+            for j in range(0, math.ceil(SCREEN_WIDTH/ TILE_WIDTH)):
+                if(i%2 == 0):
+                    coordinateStart = (self.start[0] + j*TILE_WIDTH, (self.start[1]+i*TILE_WIDTH/4)+i)
+                else:
+                    coordinateStart = (self.start[0] + (j * TILE_WIDTH) - (TILE_WIDTH / 2),(self.start[1] + i * TILE_WIDTH / 4) + i)
+                coordinateEnd = (coordinateStart[0] + TILE_WIDTH, coordinateStart[1])
+                tiles.append(Tile(coordinateStart, coordinateEnd, "mountain",self.screen))
+        return tiles
 
-    # Calculate the 4 corners of the diamond
-    top = (cx, cy - TILE_HEIGHT / 2)
-    right = (cx + TILE_WIDTH / 2, cy)
-    bottom = (cx, cy + TILE_HEIGHT / 2)
-    left = (cx - TILE_WIDTH / 2, cy)
 
-    pygame.draw.polygon(surface, color, [top, right, bottom, left])
-    pygame.draw.polygon(surface, (0, 0, 0), [top, right, bottom, left], 1)  # border
 
-TILE_WIDTH = 64
-TILE_HEIGHT = 32
 
-def grid_to_iso(gx: int, gy: int) -> tuple[int, int]:
-    """
-    Convert grid coordinates into isometric coordinates
-    """
-    x = (gx - gy) * (TILE_WIDTH / 2)
-    y = (gx + gy) * (TILE_HEIGHT / 2)
-    return int(x), int(y)
+class Tile:
+    def __init__(self, coordinateStart:tuple[float,float], coordinateEnd:tuple[float,float], typeName:str, screen:pygame.Surface):
+        self.type = typeName
+        self.coordinateStart = coordinateStart
+        self.coordinateEnd = coordinateEnd
+        self.screen = screen
 
-def screen_to_grid(
-    screen_x: int,
-    screen_y: int
-) -> tuple[int, int]:
-    """
-    Convert screen coordinates to grid coordinates (isometric)
-    """
-    # Remove the centering offset
-    x = screen_x - SCREEN_WIDTH // 2
-    y = screen_y - 200
+        width = coordinateEnd[0] - coordinateStart[0]
+        middleHigh = ((coordinateStart[0] + width / 2), coordinateStart[1] - (width / 4))
+        middleLow = ((coordinateStart[0] + width / 2), coordinateStart[1] + (width / 4))
+        pygame.draw.polygon(screen, (59, 153, 0), (coordinateStart, coordinateEnd, middleHigh))
+        pygame.draw.polygon(screen, (59, 153, 0), (coordinateStart, coordinateEnd, middleLow))
 
-    # Reverse the isometric projection formula
-    gx = (y / (TILE_HEIGHT / 2) + x / (TILE_WIDTH / 2)) / 2
-    gy = (y / (TILE_HEIGHT / 2) - x / (TILE_WIDTH / 2)) / 2
+    def drawType(self):
+        if self.type == "mountain":
+            baseLength = math.ceil(self.coordinateEnd[0] - self.coordinateStart[0])
+            print(baseLength)
+            #todo pass arguments in self for mountains
+            mountain = Mountain(3,20,10, baseLength-10, 100, 20, 25, self.coordinateStart, self.screen)
+            mountain.drawMountain(3,20,10, baseLength-10, 15, 20, 25, self.coordinateStart)
 
-    return int(gx), int(gy)
+
+
+tiles1 = Tiles(START_COORDINATES, screen)
+tiles = tiles1.fillBottomScreen()
+for i in range(0,len(tiles)-1):
+    tiles[i].drawType()
 
 running = True
 while running:
@@ -65,12 +67,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill((30, 30, 30))
-
-    # Draw all tiles
-    for gx in range(GRID_SIZE):
-        for gy in range(GRID_SIZE):
-            draw_tile_iso(screen, gx, gy, (100, 150, 100))
 
     #updates the screen
     pygame.display.flip()
