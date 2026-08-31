@@ -3,11 +3,9 @@ name = "audio-to-video"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "Joseph Fiorina", email = "josephfiorina.nml@gmail.com" }
-]
+authors = [{ name = "Joseph Fiorina", email = "josephfiorina.nml@gmail.com" }]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = ["pretty-midi>=0.2.11.post0"]
 
 [project.scripts]
 audio-to-video = "audio_to_video:main"
@@ -15,3 +13,6 @@ audio-to-video = "audio_to_video:main"
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 120
