@@ -80,18 +80,18 @@ class Mountain:
         pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], pointYHigh, arrHigh[len(arrHigh)-1]))
 
 
-    def drawMountain(self, nbrLevels: int, nextLvlSizeReduce: int, points: int, baseLength: int, height: int, sizeDiff: int, lowPerc: int, startCoordinates: tuple[float, float]):
-        level = Mountain.levelCreate(points, baseLength, height, sizeDiff, lowPerc, startCoordinates)
+    def drawMountain(self):
+        level = Mountain.levelCreate(self.points, self.baseLength, self.height, self.sizeDiff, self.lowPerc, self.startCoordinates)
         Mountain.drawLevel(self, level[0], level[1])
 
-        for i in range(1, nbrLevels):
+        for i in range(1, self.nbrLevels):
             newLength = level[1][len(level[1])-1][0]-level[1][0][0]
-            newLength = newLength - newLength * nextLvlSizeReduce / 100
-            newCoords = level[1][0][0] + newLength * nextLvlSizeReduce / 2 / 100, level[1][0][1]
+            newLength = newLength - newLength * self.nextLvlSizeReduce / 100
+            newCoords = level[1][0][0] + newLength * self.nextLvlSizeReduce / 2 / 100, level[1][0][1]
 
-            if i == nbrLevels -1:
-                level = Mountain.levelCreate(3, newLength, int(height/1.2), sizeDiff + 40, lowPerc-8, newCoords)
+            if i == self.nbrLevels -1:
+                level = Mountain.levelCreate(3, newLength, int(self.height/1.2), self.sizeDiff + 40, self.lowPerc-8, newCoords)
             else:
-                level = Mountain.levelCreate(points, newLength, int(height + height * 0.2), sizeDiff + 15, lowPerc, newCoords)
+                level = Mountain.levelCreate(self.points, newLength, int(self.height + self.height * 0.2), self.sizeDiff + 15, self.lowPerc, newCoords)
 
             Mountain.drawLevel(self, level[0], level[1])
