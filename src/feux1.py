@@ -1,6 +1,7 @@
 import random
 import pygame
 import math
+import drawmethod
 
 Color = {
     0 : (255,0,0),     # rouge
@@ -87,7 +88,7 @@ class Firework():
         self.timer += 1/90
         
     def draw(self):
-        drawcircle(self.display,(255,255,255),self.x,self.y,2,10)
+        drawmethod.drawcircle(self.display,(255,255,255),self.x,self.y,2,10)
         #a = [self.x,self.y-self.longueur]
         #b = [self.x-self.longueur,self.y+self.longueur]
         #c = [self.x+self.longueur,self.y+self.longueur]
@@ -128,11 +129,11 @@ class Explosion():
             self.end = True
     def draw(self):
         if self.instrument == "METEORITE":
-            drawcircle(self.display,(self.color_particule),self.x,self.y,5,10)
+            drawmethod.drawcircle(self.display,(self.color_particule),self.x,self.y,5,10)
         elif self.instrument =="ETOILE":
-            draw_star(self.display,self.color,self.x,self.y,5)
+            drawmethod.draw_star(self.display,self.color,self.x,self.y,5)
         else:
-            draw_star(self.display,(self.color_particule),self.x,self.y,5)
+            drawmethod.draw_star(self.display,(self.color_particule),self.x,self.y,5)
             
             
             
@@ -167,55 +168,4 @@ class Trail():
         else:
             pygame.draw.polygon(self.display,self.color_particule,(self.a,self.b,self.c))
 
-
-def drawcircle(display,color,x,y,rayon,nbr_point):
-    angle = 360/nbr_point
-    new_angle = 0
-    center = [int(x),int(y)]
-    next1 = [int(center[0])+rayon,center[1]]
-    for i in range(1,nbr_point+1):     
-        new_angle = angle * i
-        futur_point = next_point(center,new_angle,rayon)     
-        pygame.draw.polygon(display,color,((center),next1,futur_point))
-        next1 = futur_point
-
-def next_point(center,angle,rayon):
-    augment_y = math.sin(math.radians(angle))*rayon
-    augment_x = math.cos(math.radians(angle))*rayon
-    next_point = [int(center[0] + augment_x),int(center[1]-augment_y)]
-    return next_point
-
-
-def draw_rectangle(display,color,x,y,longueur):
-    centre = [x,y+longueur*2]
-    point1 = [x-longueur/1.5,y+longueur]
-    point2 = [x+longueur/1.5,y+longueur]
-    point3 = [x+longueur/1.5,y+longueur*4]
-    point4 = [x-longueur/1.5,y+longueur*4]
-    pygame.draw.polygon(display,color,(centre,point1,point2))
-    pygame.draw.polygon(display,color,(centre,point2,point3))
-    pygame.draw.polygon(display,color,(centre,point3,point4))
-    pygame.draw.polygon(display,color,(centre,point4,point1))
-
-
-def draw_star(display,color,x,y,rayon):
-    l1 = [x,y-(rayon/2)]
-    l2 = [x+(rayon/2),y]
-    l3 = [x-(rayon/2),y]
-    l4 = [x,y+(rayon/2)]
-    point1 = [x,y-rayon]
-    point2 = [x+rayon,y]
-    point3 = [x-rayon,y]
-    point4 = [x,y+rayon]
-    pygame.draw.polygon(display,color,(l2,l3,point1))
-    pygame.draw.polygon(display,color,(l1,l4,point2))
-    pygame.draw.polygon(display,color,(l1,l4,point3))
-    pygame.draw.polygon(display,color,(l2,l3,point4))
-
-
-
-        
-        
-
-        
 
