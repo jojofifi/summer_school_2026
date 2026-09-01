@@ -14,11 +14,9 @@ class Tiles:
         self.width = width
         self.tileWidth = tileWidth
 
-    def fillBottomScreen(self, seed, zoom):
+    def createTiles(self, seed, zoom):
         tmp = OpenSimplex(seed=seed)
-
         line = math.ceil(self.height/(self.tileWidth/2)+1)
-        print(line)
         column = math.ceil(self.width/ self.tileWidth)+1
         arrNoise = np.zeros((line, column))
         tiles = []
@@ -52,7 +50,10 @@ class Tile:
         self.coordinateStart = coordinateStart
         self.coordinateEnd = coordinateEnd
         self.screen = screen
-        Tile.drawType(self)
+        baseLength = math.ceil(self.coordinateEnd[0] - self.coordinateStart[0])
+        self.mountain = Mountain(4, 20, 10, baseLength - 10, math.ceil(baseLength / 6), 20, 25, self.coordinateStart,self.screen)
+
+
 
 
 
@@ -63,9 +64,7 @@ class Tile:
         if self.type == "mountain":
             pygame.draw.polygon(self.screen, (59, 153, 0), (self.coordinateStart, self.coordinateEnd, middleHigh))
             pygame.draw.polygon(self.screen, (59, 153, 0), (self.coordinateStart, self.coordinateEnd, middleLow))
-            baseLength = math.ceil(self.coordinateEnd[0] - self.coordinateStart[0])
-            mountain = Mountain(4,20,10, baseLength-10, math.ceil(baseLength/6), 20, 25, self.coordinateStart, self.screen)
-            mountain.drawMountain()
+            self.mountain.drawMountain()
         elif self.type == "plains":
             pygame.draw.polygon(self.screen, (59, 153, 0), (self.coordinateStart, self.coordinateEnd, middleHigh))
             pygame.draw.polygon(self.screen, (59, 153, 0), (self.coordinateStart, self.coordinateEnd, middleLow))

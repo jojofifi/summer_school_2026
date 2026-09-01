@@ -1,5 +1,6 @@
 from object.feux import Firework
 from object.feux import Explosion
+from tile import Tiles
 import  drawingtools.drawmethod 
 import pretty_midi as pm
 import object.sunandmoon
@@ -10,7 +11,7 @@ import random
 
 pygame.init()
 
-midi_path = "src\\audio_to_video\\media\\PinkPanther.midi"
+midi_path = "media/PinkPanther.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 screen_height = 600
@@ -76,16 +77,17 @@ all_notes = [t for t, p in combined]
 all_pitch = [p for t, p in combined]
 moon = object.sunandmoon.Lune(display,-50,200,3*(duree_totale/5))
 sun = object.sunandmoon.Soleil(display,-50,200,2*(duree_totale/5))
-print(midi.get_end_time())
 
+
+START_COORDINATES = (0,screen_height/2)
+tiles = Tiles(START_COORDINATES, display, screen_height, screen_width, 130)
+mapTile = tiles.createTiles(42,4)
 
 while run:
     realtime = pygame.mixer.music.get_pos()/1000 
     for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-
-
     step += 1
     if step < number_of_steps:
         if index_couleur < nbr_transitions:
@@ -139,7 +141,9 @@ while run:
         if explosion.end:
             explosions.remove(explosion)
             del explosion
-            
+
+    for each in mapTile:
+        each.drawType()
 
     pygame.display.update()
     clock.tick(FPS)

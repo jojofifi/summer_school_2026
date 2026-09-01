@@ -15,6 +15,8 @@ class Mountain:
         self.lowPerc = lowPerc
         self.startCoordinates = startCoordinates
         self.screen = screen
+        self.levels = []
+        Mountain.createMountain(self)
 
     def lineCreate(faces:int, length:int, startCoordinates:tuple[float, float], lowPer:int):
         steps = math.ceil(math.ceil(faces / 2) / 2)
@@ -80,18 +82,19 @@ class Mountain:
         pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], pointYHigh, arrHigh[len(arrHigh)-1]))
 
 
-    def drawMountain(self):
-        level = Mountain.levelCreate(self.points, self.baseLength, self.height, self.sizeDiff, self.lowPerc, self.startCoordinates)
-        Mountain.drawLevel(self, level[0], level[1])
+    def createMountain(self):
+        self.levels.append(Mountain.levelCreate(self.points, self.baseLength, self.height, self.sizeDiff, self.lowPerc, self.startCoordinates))
 
-        for i in range(1, self.nbrLevels):
-            newLength = level[1][len(level[1])-1][0]-level[1][0][0]
+        for i in range(0, self.nbrLevels-1):
+            newLength = self.levels[i][1][len(self.levels[i][1])-1][0]-self.levels[i][1][0][0]
             newLength = newLength - newLength * self.nextLvlSizeReduce / 100
-            newCoords = level[1][0][0] + newLength * self.nextLvlSizeReduce / 2 / 100, level[1][0][1]
+            newCoords = self.levels[i][1][0][0] + newLength * self.nextLvlSizeReduce / 2 / 100, self.levels[i][1][0][1]
 
-            if i == self.nbrLevels -1:
-                level = Mountain.levelCreate(3, newLength, int(self.height/1.2), self.sizeDiff + 40, self.lowPerc-8, newCoords)
+            if i == self.nbrLevels -2:
+                self.levels.append(Mountain.levelCreate(3, newLength, int(self.height/1.2), self.sizeDiff + 40, self.lowPerc-8, newCoords))
             else:
-                level = Mountain.levelCreate(self.points, newLength, int(self.height + self.height * 0.2), self.sizeDiff + 15, self.lowPerc, newCoords)
+                self.levels.append(Mountain.levelCreate(self.points, newLength, int(self.height + self.height * 0.2), self.sizeDiff + 15, self.lowPerc, newCoords))
 
+    def drawMountain(self):
+        for level in self.levels:
             Mountain.drawLevel(self, level[0], level[1])
