@@ -116,9 +116,9 @@ class Explosion():
         if self.y < 550 :
             self.vy += 0.0085
         if self.instrument =="METEORITE" or self.instrument=="PARTICULE":
-            if self.timer%5==0:
+            if self.timer%3==0:
                 self.trails.insert(0,Trail(self.x,self.y,self.color,self.color_particule,self.display))
-            if(len(self.trails) > 25):
+            if(len(self.trails) > 20):
                 del self.trails[len(self.trails) - 1]
             for index, trail in enumerate(self.trails):
                 trail.update(index)
@@ -155,7 +155,7 @@ class Trail():
         pygame.draw.polygon(self.display,self.color_particule,(self.a,self.b,self.c))
     def update(self,index):
         self.timer += 1
-        if self.timer == 40:
+        if self.timer == 30:
             self.exist=False
             self.timer = 0
         if not self.exist:
