@@ -1,10 +1,9 @@
-from feux1 import Firework
-from feux1 import Explosion
-import  drawmethod
+from object.feux import Firework
+from object.feux import Explosion
+import  drawingtools.drawmethod 
 import pretty_midi as pm
-import lune
-import soleil 
-import testgrammar
+import object.sunandmoon
+import object.fireworkgrammar as fireworkgrammar
 import pygame
 import random
 
@@ -24,16 +23,16 @@ fireworks = []
 explosions = []
 run = True
 
-rules = testgrammar.Rules()  
+rules = fireworkgrammar.Rules()  
 
-rules.add_rule(testgrammar.Firework.Firework, [testgrammar.Symbol.MONTEE,testgrammar.Symbol.EXPLOSION])
+rules.add_rule(fireworkgrammar.Firework.Firework, [fireworkgrammar.Symbol.MONTEE,fireworkgrammar.Symbol.EXPLOSION])
 
-rules.add_rule(testgrammar.Symbol.MONTEE, testgrammar.Terminal.LINEAIRE)
-rules.add_rule(testgrammar.Symbol.MONTEE, testgrammar.Terminal.COURBER)
+rules.add_rule(fireworkgrammar.Symbol.MONTEE, fireworkgrammar.Terminal.LINEAIRE)
+rules.add_rule(fireworkgrammar.Symbol.MONTEE, fireworkgrammar.Terminal.COURBER)
 
-rules.add_rule(testgrammar.Symbol.EXPLOSION, testgrammar.Terminal.ETOILE)
-rules.add_rule(testgrammar.Symbol.EXPLOSION, testgrammar.Terminal.PARTICULE)
-rules.add_rule(testgrammar.Symbol.EXPLOSION, testgrammar.Terminal.METEORITE)
+rules.add_rule(fireworkgrammar.Symbol.EXPLOSION, fireworkgrammar.Terminal.ETOILE)
+rules.add_rule(fireworkgrammar.Symbol.EXPLOSION, fireworkgrammar.Terminal.PARTICULE)
+rules.add_rule(fireworkgrammar.Symbol.EXPLOSION, fireworkgrammar.Terminal.METEORITE)
 Couleur = {
         0: (5, 10, 40),       # Nuit haut (bleu très sombre)
         1: (20, 25, 70),      # Nuit bas 
@@ -55,7 +54,7 @@ number_of_steps = change_every_x_seconds * FPS
 
 
 
-gen = testgrammar.Generator(rules)
+gen = fireworkgrammar.Generator(rules)
 
 pygame.mixer.init()
 pygame.mixer.music.load(midi_path)
@@ -75,8 +74,8 @@ for instrument in midi.instruments:
 combined = sorted(zip(all_notes,all_pitch))
 all_notes = [t for t, p in combined] 
 all_pitch = [p for t, p in combined]
-moon = lune.Lune(display,-50,200,3*(duree_totale/5))
-sun = soleil.Soleil(display,-50,200,2*(duree_totale/5))
+moon = object.sunandmoon.Lune(display,-50,200,3*(duree_totale/5))
+sun = object.sunandmoon.Soleil(display,-50,200,2*(duree_totale/5))
 print(midi.get_end_time())
 
 
@@ -104,16 +103,16 @@ while run:
     
     if not moon.end:
         moon.move()
-        drawmethod.draw_contour_soleil(display,moon.x,moon.y,1150,base_couleur,next_couleur,15,15)
+        drawingtools.drawmethod.draw_background(display,moon.x,moon.y,1150,base_couleur,next_couleur,15,15)
         moon.draw(base_couleur)
         
     else:
         sun.move()
         sun.draw()
-        drawmethod.draw_contour_soleil(display,sun.x,sun.y,1150,base_couleur,next_couleur,15,15)
+        drawingtools.drawmethod.draw_background(display,sun.x,sun.y,1150,base_couleur,next_couleur,15,15)
     sun.draw()      
     while all_notes[note_number]<=realtime:
-        result = gen.generate(testgrammar.Firework.Firework)
+        result = gen.generate(fireworkgrammar.Firework.Firework)
         style = result.children[1].children[0].value.name
         courbure = result.children[0].children[0].value.name  
         fireworks.append(Firework(flight_time,display,all_pitch[note_number],1,style,courbure))

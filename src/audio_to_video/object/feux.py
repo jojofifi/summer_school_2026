@@ -1,7 +1,7 @@
 import random
 import pygame
 import math
-import drawmethod
+import drawingtools.drawmethod as drawmethod 
 
 Color = {
     0 : (255,0,0),     # rouge

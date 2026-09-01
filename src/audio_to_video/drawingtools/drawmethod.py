@@ -61,7 +61,7 @@ def draw_rays(display,color,x,y,rayon,nbr_point):
         c = [x+augment_x2,y-augment_y2]
         pygame.draw.polygon(display,color,(a,b,c))
 
-def draw_contour_soleil(display, x, y, rayon_max, couleur_proche, couleur_loin, nbr_anneaux, nbr_point):
+def draw_background(display, x, y, rayon_max, couleur_proche, couleur_loin, nbr_anneaux, nbr_point):
     for i in range(nbr_anneaux, 0, -1):
         t = i / nbr_anneaux
         rayon = int(rayon_max * t)
