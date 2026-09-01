@@ -1,7 +1,7 @@
 from object.feux import Firework
 from object.feux import Explosion
 from tile import Tiles
-import drawingtools.drawmethod
+import drawingtools.drawmethod as drawmethod
 import pretty_midi as pm
 import object.sunandmoon
 import object.fireworkgrammar as fireworkgrammar
@@ -11,7 +11,7 @@ import random
 
 pygame.init()
 
-midi_path = "media/PinkPanther.midi"
+midi_path = "src\\audio_to_video\\media\\PinkPanther.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 screen_height = 600
@@ -103,7 +103,7 @@ while run:
 
     if not moon.end:
         moon.move()
-        drawmethod.draw_background(display, moon.x, moon.y, 1150, base_couleur, next_couleur, 6, 10)
+        drawmethod.draw_background(display, moon.x, moon.y, 1150, base_couleur, next_couleur, 5, 10)
         moon.draw(base_couleur)
 
     else:
@@ -111,6 +111,7 @@ while run:
         sun.draw()
         drawmethod.draw_background(display, sun.x, sun.y, 1150, base_couleur, next_couleur, 6, 10)
     sun.draw()
+
     while all_notes[note_number] <= realtime:
         result = gen.generate(fireworkgrammar.Firework.Firework)
         style = result.children[1].children[0].value.name
@@ -123,7 +124,7 @@ while run:
         firework.draw()
         if firework.end:
             if firework.instrument == "ETOILE":
-                for i in range(random.randint(20, 40)):
+                for i in range(random.randint(15, 20)):
                     explosions.append(
                         Explosion(
                             display,
@@ -133,31 +134,7 @@ while run:
                             firework.color_particule,
                             firework.ended_explosion,
                             firework.instrument,
-                            random.uniform(1, 0.75),
-                        )
-                    )
-                    explosions.append(
-                        Explosion(
-                            display,
-                            firework.x,
-                            firework.y,
-                            firework.color,
-                            firework.color_particule,
-                            firework.ended_explosion,
-                            firework.instrument,
-                            random.uniform(0.75, 0.5),
-                        )
-                    )
-                    explosions.append(
-                        Explosion(
-                            display,
-                            firework.x,
-                            firework.y,
-                            firework.color,
-                            firework.color_particule,
-                            firework.ended_explosion,
-                            firework.instrument,
-                            random.uniform(0.5, 0.25),
+                            random.uniform(1, 0.25),
                         )
                     )
             else:
@@ -176,6 +153,10 @@ while run:
                     )
             fireworks.remove(firework)
             del firework
+
+    for each in mapTile:
+        each.drawType()
+
     for explosion in explosions:
         explosion.move()
         explosion.draw()
@@ -186,4 +167,3 @@ while run:
     pygame.display.update()
     clock.tick(FPS)
 pygame.quit
-
