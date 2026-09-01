@@ -110,10 +110,13 @@ class Explosion():
         self.display = display
         self.trails = []
         self.instrument = instrument
+        self.taille = 5 + rayon * 8
 
         
     def move(self):
-        if self.y < 550 :
+        if self.y < 550 and self.instrument =="METEORITE" :
+            self.vy += 0.015
+        elif self.y < 550 :
             self.vy += 0.0085
         if self.instrument =="METEORITE" or self.instrument=="PARTICULE":
             if self.timer%3==0:
@@ -131,9 +134,9 @@ class Explosion():
         if self.instrument == "METEORITE":
             drawmethod.drawcircle(self.display,(self.color_particule),self.x,self.y,5,10)
         elif self.instrument =="ETOILE":
-            drawmethod.draw_star(self.display,self.color,self.x,self.y,5)
+            drawmethod.draw_star(self.display,self.color,self.x,self.y,self.taille)
         else:
-            drawmethod.draw_star(self.display,(self.color_particule),self.x,self.y,5)
+            drawmethod.draw_star(self.display,(self.color_particule),self.x,self.y,self.taille)
             
             
             
