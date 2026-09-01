@@ -18,50 +18,49 @@ class Mountain:
         self.levels = []
         Mountain.createMountain(self)
 
-    def lineCreate(faces:int, length:int, startCoordinates:tuple[float, float], lowPer:int):
-        steps = math.ceil(math.ceil(faces / 2) / 2)
+    def lineCreate(self, points:int, length:int, startCoordinates:tuple[float, float], lowPer:int):
+        steps = math.ceil(math.ceil(points / 2) / 2)
         arr = []
         nextX = []
-        nextY = np.zeros(faces, dtype=int)
+        nextY = np.zeros(points, dtype=int)
 
-        xCalc = length/faces
-        for i in range(0, faces):
+        xCalc = length/(points-1)
+        for i in range(0, points):
             if i == 0:
                 nextX.append(startCoordinates[0])
-            elif i == faces -1:
-                nextX.append(startCoordinates[0]+length)
             else:
                 rdm = random.randint(math.ceil(xCalc * i - xCalc / 2) * 100, math.ceil(xCalc * i + xCalc / 2) * 100) / 100
+                print(rdm)
                 nextX.append(startCoordinates[0]+rdm)
 
-        for i in range(0, math.ceil(faces/2)):
+        for i in range(0, math.ceil(points/2)):
             # starting point
             if i == 0:
                 nextY[i] = startCoordinates[1]
-                nextY[faces - i - 1] = startCoordinates[1]
+                nextY[points - i - 1] = startCoordinates[1]
             elif i == 1:
                 nextY[i] = nextY[i - 1] + (length * ((lowPer/steps) / 100))
-                nextY[faces - i-1] = nextY[i - 2] + (length * ((lowPer/steps) / 100))
+                nextY[points - i-1] = nextY[i - 2] + (length * ((lowPer/steps) / 100))
 
             elif i % 2 == 1:
                 nextY[i] = nextY[i - 2] + (length * ((lowPer/steps) / 100))
-                nextY[faces - i - 1] = nextY[i - 2] + (length * ((lowPer/steps) / 100))
+                nextY[points - i - 1] = nextY[i - 2] + (length * ((lowPer/steps) / 100))
             elif i % 2 == 0:
                 nextY[i] = random.randint(math.ceil(nextY[i - 2] * 10), math.ceil(nextY[i - 1] * 10)) / 10
-                nextY[faces - i-1] = random.randint(math.ceil(nextY[faces - i-1 + 2] * 10), math.ceil(nextY[faces - i-1 + 1] * 10)) / 10
+                nextY[points - i-1] = random.randint(math.ceil(nextY[points - i-1 + 2] * 10), math.ceil(nextY[points - i-1 + 1] * 10)) / 10
             else:
                 nextY[i] = startCoordinates[1] + (length * (lowPer / 100))
-                nextY[faces - i - 1] = startCoordinates[1] + (length * (lowPer / 100))
+                nextY[points - i - 1] = startCoordinates[1] + (length * (lowPer / 100))
 
         for i in range(0, len(nextX)):
             arr.append([nextX[i], float(nextY[i])])
 
         return arr
 
-    def levelCreate(faces:int, baseLength:int, height:int, sizeDiff:int, lowPerc:int, startCoordinates:tuple[float, float]):
-        bottomCoords = Mountain.lineCreate(faces,baseLength,startCoordinates,lowPerc)
+    def levelCreate(self, points:int, baseLength:int, height:int, sizeDiff:int, lowPerc:int, startCoordinates:tuple[float, float]):
+        bottomCoords = Mountain.lineCreate(self, points,baseLength,startCoordinates,lowPerc)
         topStartCoord = (startCoordinates[0]+(baseLength*sizeDiff/2/100),startCoordinates[1]-height)
-        topCoords = Mountain.lineCreate(faces,int(baseLength-(baseLength*(sizeDiff/100))),topStartCoord,lowPerc)
+        topCoords = Mountain.lineCreate(self, points,int(baseLength-(baseLength*(sizeDiff/100))),topStartCoord,lowPerc)
         return bottomCoords, topCoords
 
     def drawLevel(self, arrLow:list, arrHigh:list):
@@ -83,7 +82,7 @@ class Mountain:
 
 
     def createMountain(self):
-        self.levels.append(Mountain.levelCreate(self.points, self.baseLength, self.height, self.sizeDiff, self.lowPerc, self.startCoordinates))
+        self.levels.append(Mountain.levelCreate(self, self.points, self.baseLength, self.height, self.sizeDiff, self.lowPerc, self.startCoordinates))
 
         for i in range(0, self.nbrLevels-1):
             newLength = self.levels[i][1][len(self.levels[i][1])-1][0]-self.levels[i][1][0][0]
@@ -91,9 +90,9 @@ class Mountain:
             newCoords = self.levels[i][1][0][0] + newLength * self.nextLvlSizeReduce / 2 / 100, self.levels[i][1][0][1]
 
             if i == self.nbrLevels -2:
-                self.levels.append(Mountain.levelCreate(3, newLength, int(self.height/1.2), self.sizeDiff + 40, self.lowPerc-8, newCoords))
+                self.levels.append(Mountain.levelCreate(self, 3, newLength, int(self.height/1.2), self.sizeDiff + 40, self.lowPerc-8, newCoords))
             else:
-                self.levels.append(Mountain.levelCreate(self.points, newLength, int(self.height + self.height * 0.2), self.sizeDiff + 15, self.lowPerc, newCoords))
+                self.levels.append(Mountain.levelCreate(self, self.points, newLength, int(self.height + self.height * 0.2), self.sizeDiff + 15, self.lowPerc, newCoords))
 
     def drawMountain(self):
         for level in self.levels:
