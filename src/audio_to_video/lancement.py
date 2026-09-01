@@ -113,10 +113,14 @@ while run:
     sun.draw()
 
     while all_notes[note_number] <= realtime:
+        note_start = all_notes[note_number] + flight_time
         result = gen.generate(fireworkgrammar.Firework.Firework)
         style = result.children[1].children[0].value.name
         courbure = result.children[0].children[0].value.name
-        fireworks.append(Firework(flight_time, display, all_pitch[note_number], 1, style, courbure))
+        if note_start < flight_time:
+            fireworks.append(Firework(note_start, display, all_pitch[note_number], 1, style, courbure))
+        else:
+            fireworks.append(Firework(flight_time, display, all_pitch[note_number], 1, style, courbure))
         note_number += 1
 
     for firework in fireworks:
