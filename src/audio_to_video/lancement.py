@@ -129,10 +129,10 @@ while run:
         if firework.end:
             if firework.instrument=="ETOILE":
                  for i in range(random.randint(15,20)):
-                    explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.25)))
+                    explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.25),current_color))
             else:
                 for i in range(random.randint(20,40)):
-                    explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.75)))
+                    explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.75),current_color))
             fireworks.remove(firework)
             del firework
     
