@@ -84,7 +84,7 @@ class Firework():
             del self.trails[len(self.trails) - 1]
         
         for trail in self.trails:
-            trail.update(999)
+            trail.update(999,1,(255,255,255))
         self.timer += 1/90
         
     def draw(self):
@@ -96,7 +96,7 @@ class Firework():
         #draw_rectangle(self.display,(255,255,255),self.x,self.y,self.longueur)
 
 class Explosion():
-    def __init__(self,display,x,y,color,color_particule,ended_explosion,instrument,rayon):
+    def __init__(self,display,x,y,color,color_particule,ended_explosion,instrument,rayon,couleur_fond):
         self.x = x
         self.y = y
         self.angle = random.uniform(0,360)
@@ -111,9 +111,11 @@ class Explosion():
         self.trails = []
         self.instrument = instrument
         self.taille = 5 + rayon * 8
+        self.couleur_fond = couleur_fond
 
         
     def move(self):
+        self.fade = 1-(self.timer/(self.end_time*90)) 
         if self.y < 550 and self.instrument =="METEORITE" :
             self.vy += 0.015
         elif self.y < 550 :
@@ -123,20 +125,23 @@ class Explosion():
                 self.trails.insert(0,Trail(self.x,self.y,self.color,self.color_particule,self.display))
             if(len(self.trails) > 20):
                 del self.trails[len(self.trails) - 1]
-            for index, trail in enumerate(self.trails):
-                trail.update(index)
+            for index in range(len(self.trails)-1, -1, -1):
+                self.trails[index].update(index,self.fade,self.couleur_fond)
         self.timer += 1
         self.x += self.vx
         self.y += self.vy
         if self.timer == self.end_time*90:
             self.end = True
     def draw(self):
+        
+        color_fade = tuple(int(c1 + (c2-c1)*(1-self.fade)) for c1, c2 in zip(self.color, self.couleur_fond))
+        color_particule_fade = tuple(int(c1 + (c2-c1)*(1-self.fade)) for c1, c2 in zip(self.color_particule, self.couleur_fond))
         if self.instrument == "METEORITE":
-            drawmethod.drawcircle(self.display,(self.color_particule),self.x,self.y,5,10)
+            drawmethod.drawcircle(self.display,(color_particule_fade),self.x,self.y,5,10)
         elif self.instrument =="ETOILE":
-            drawmethod.draw_star(self.display,self.color,self.x,self.y,self.taille)
+            drawmethod.draw_star(self.display,color_fade,self.x,self.y,self.taille)
         else:
-            drawmethod.draw_star(self.display,(self.color_particule),self.x,self.y,self.taille)
+            drawmethod.draw_star(self.display,(color_particule_fade),self.x,self.y,self.taille)
             
             
             
@@ -155,8 +160,7 @@ class Trail():
         self.b = [self.x-3,self.y+3]
         self.c = [self.x+3,self.y+3]
         self.color_particule = color_particule
-        pygame.draw.polygon(self.display,self.color_particule,(self.a,self.b,self.c))
-    def update(self,index):
+    def update(self,index,fade,couleur_fond):
         self.timer += 1
         if self.timer == 30:
             self.exist=False
@@ -166,9 +170,11 @@ class Trail():
         self.a = [self.x,self.a[1]+0.05]
         self.b = [self.b[0]+0.05,self.b[1]-0.05]
         self.c = [self.c[0]-0.05,self.c[1]-0.05]
+        color_fade = tuple(int(c1 + (c2-c1)*(1-fade)) for c1, c2 in zip(self.color, couleur_fond))
+        color_particule_fade = tuple(int(c1 + (c2-c1)*(1-fade)) for c1, c2 in zip(self.color_particule, couleur_fond))               
         if index>=5:
-            pygame.draw.polygon(self.display,self.color,(self.a,self.b,self.c))
+            pygame.draw.polygon(self.display,color_fade,(self.a,self.b,self.c))
         else:
-            pygame.draw.polygon(self.display,self.color_particule,(self.a,self.b,self.c))
+            pygame.draw.polygon(self.display,color_particule_fade,(self.a,self.b,self.c))
 
 
