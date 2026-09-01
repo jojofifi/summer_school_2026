@@ -36,8 +36,8 @@ rules.add_rule(fireworkgrammar.Symbol.EXPLOSION, fireworkgrammar.Terminal.PARTIC
 rules.add_rule(fireworkgrammar.Symbol.EXPLOSION, fireworkgrammar.Terminal.METEORITE)
 Couleur = {
         0: (5, 10, 40),       # Nuit haut (bleu très sombre)
-        1: (20, 25, 70),      # Nuit bas 
-        2: (60, 40, 70),      # Aube haut 
+        1: (20, 25, 70),      # Nuit bas
+        2: (60, 40, 70),      # Aube haut
         3: (200, 90, 60),     # Aube bas 
         4: (255, 170, 60),    # Lever de soleil haut
         5: (255, 210, 120),   # Lever de soleil bas 
