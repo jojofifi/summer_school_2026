@@ -28,9 +28,10 @@ class Mountain:
         for i in range(0, points):
             if i == 0:
                 nextX.append(startCoordinates[0])
+            elif i == points -1:
+                nextX.append(startCoordinates[0]+length)
             else:
                 rdm = random.randint(math.ceil(xCalc * i - xCalc / 2) * 100, math.ceil(xCalc * i + xCalc / 2) * 100) / 100
-                print(rdm)
                 nextX.append(startCoordinates[0]+rdm)
 
         for i in range(0, math.ceil(points/2)):
@@ -64,16 +65,17 @@ class Mountain:
         return bottomCoords, topCoords
 
     def drawLevel(self, arrLow:list, arrHigh:list):
-        colorBackground = (0, 255, 0)
         for i in range(0, len(arrHigh)-1):
             if i % 2 == 0:
-                colorBackground = (0, 0, 255)
+                newRGB = random.randint(0,100)
+                colorBackground = (37, newRGB, newRGB)
             else:
-                colorBackground = (255, 0, 0)
+                newRGB = random.randint(100, 200)
+                colorBackground = (37, newRGB, newRGB)
             pygame.draw.polygon(self.screen, colorBackground, (arrLow[i], arrHigh[i], arrHigh[i+1]))
             pygame.draw.polygon(self.screen, colorBackground, (arrLow[i], arrLow[i+1], arrHigh[i+1]))
             if i < len(arrHigh)-2:
-                colorBackground = (0, 255, 0)
+                colorBackground = (244, 233, 201)
                 pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], arrHigh[i+1], arrHigh[i+2]))
         colorBackground = (0, 255, 0)
         diff = arrHigh[math.ceil(len(arrHigh)/2)][1] - arrHigh[0][1]

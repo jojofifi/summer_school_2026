@@ -11,7 +11,7 @@ import random
 
 pygame.init()
 
-midi_path = "src\\audio_to_video\\media\\PinkPanther.midi"
+midi_path = "media\PinkPanther.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 screen_height = 600
@@ -80,7 +80,7 @@ sun = object.sunandmoon.Soleil(display, -50, 200, 2 * (duree_totale / 5))
 
 START_COORDINATES = (0, screen_height / 2)
 tiles = Tiles(START_COORDINATES, display, screen_height, screen_width, 130)
-mapTile = tiles.createTiles(42, 4)
+mapTile = tiles.createTiles(45, 10)
 
 while run:
     realtime = pygame.mixer.music.get_pos() / 1000
