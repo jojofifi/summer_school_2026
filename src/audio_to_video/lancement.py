@@ -1,13 +1,13 @@
 from feux1 import Firework
 from feux1 import Explosion
-import drawmethod
+import  drawmethod
 import pretty_midi as pm
 import lune
-import soleil
+import soleil 
 import testgrammar
 import pygame
 import random
-import itertools
+
 
 pygame.init()
 
