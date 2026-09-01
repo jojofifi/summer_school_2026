@@ -1,6 +1,6 @@
 from object.feux import Firework
 from object.feux import Explosion
-import  drawingtools.drawmethod 
+import  drawingtools.drawmethod as drawmethod 
 import pretty_midi as pm
 import object.sunandmoon
 import object.fireworkgrammar as fireworkgrammar
@@ -103,13 +103,13 @@ while run:
     
     if not moon.end:
         moon.move()
-        drawingtools.drawmethod.draw_background(display,moon.x,moon.y,1150,base_couleur,next_couleur,15,15)
+        drawmethod.draw_background(display,moon.x,moon.y,1150,base_couleur,next_couleur,6,10)
         moon.draw(base_couleur)
         
     else:
         sun.move()
         sun.draw()
-        drawingtools.drawmethod.draw_background(display,sun.x,sun.y,1150,base_couleur,next_couleur,15,15)
+        drawmethod.draw_background(display,sun.x,sun.y,1150,base_couleur,next_couleur,6,10)
     sun.draw()      
     while all_notes[note_number]<=realtime:
         result = gen.generate(fireworkgrammar.Firework.Firework)
@@ -124,13 +124,14 @@ while run:
         firework.move()
         firework.draw()
         if firework.end:
-            for i in range(random.randint(20,40)):
-                if not firework.instrument=="METEORITE":
+            if firework.instrument=="ETOILE":
+                 for i in range(random.randint(20,40)):
                     explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.75)))
                     explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(0.75,0.5)))
                     explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(0.5,0.25)))
-                else:
-                     explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.75)))                 
+            else:
+                for i in range(random.randint(20,40)):
+                    explosions.append(Explosion(display,firework.x,firework.y,firework.color,firework.color_particule,firework.ended_explosion,firework.instrument,random.uniform(1,0.75)))                 
             fireworks.remove(firework)
             del firework
     for explosion in explosions:
@@ -140,7 +141,6 @@ while run:
             explosions.remove(explosion)
             del explosion
             
-
     pygame.display.update()
     clock.tick(FPS)
 pygame.quit
