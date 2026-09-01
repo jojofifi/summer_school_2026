@@ -1,11 +1,13 @@
 from feux1 import Firework
 from feux1 import Explosion
-from feux1 import drawcircle
+import drawmethod
 import pretty_midi as pm
-
+import lune
+import soleil
 import testgrammar
 import pygame
 import random
+import itertools
 
 pygame.init()
 
@@ -32,6 +34,25 @@ rules.add_rule(testgrammar.Symbol.MONTEE, testgrammar.Terminal.COURBER)
 rules.add_rule(testgrammar.Symbol.EXPLOSION, testgrammar.Terminal.ETOILE)
 rules.add_rule(testgrammar.Symbol.EXPLOSION, testgrammar.Terminal.PARTICULE)
 rules.add_rule(testgrammar.Symbol.EXPLOSION, testgrammar.Terminal.METEORITE)
+Couleur = {
+        0: (5, 10, 40),       # Nuit haut (bleu très sombre)
+        1: (20, 25, 70),      # Nuit bas 
+        2: (60, 40, 70),      # Aube haut 
+        3: (200, 90, 60),     # Aube bas 
+        4: (255, 170, 60),    # Lever de soleil haut
+        5: (255, 210, 120),   # Lever de soleil bas 
+}
+
+liste_couleur = list(Couleur.values())
+nbr_transitions = len(liste_couleur)-1
+duree_totale = midi.get_end_time()
+
+index_couleur = 0
+step = 1
+
+change_every_x_seconds = duree_totale / nbr_transitions 
+number_of_steps = change_every_x_seconds * FPS
+
 
 
 gen = testgrammar.Generator(rules)
@@ -54,7 +75,9 @@ for instrument in midi.instruments:
 combined = sorted(zip(all_notes,all_pitch))
 all_notes = [t for t, p in combined] 
 all_pitch = [p for t, p in combined]
-
+moon = lune.Lune(display,-50,200,3*(duree_totale/5))
+sun = soleil.Soleil(display,-50,200,2*(duree_totale/5))
+print(midi.get_end_time())
 
 
 while run:
@@ -62,9 +85,33 @@ while run:
     for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+
+
+    step += 1
+    if step < number_of_steps:
+        if index_couleur < nbr_transitions:
+            base_couleur = liste_couleur[index_couleur]
+            next_couleur = liste_couleur[index_couleur + 1]
+            current_color = [x + (((y-x)/number_of_steps)*step) for x, y in zip(base_couleur,next_couleur)]
+    else:
+        step=1
+        index_couleur += 1
+        if index_couleur >= nbr_transitions:
+            current_color = liste_couleur[-1]
+
+    display.fill((0,0,0))
     
-    display.fill((0, 0, 0))
     
+    if not moon.end:
+        moon.move()
+        drawmethod.draw_contour_soleil(display,moon.x,moon.y,1150,base_couleur,next_couleur,15,15)
+        moon.draw(base_couleur)
+        
+    else:
+        sun.move()
+        sun.draw()
+        drawmethod.draw_contour_soleil(display,sun.x,sun.y,1150,base_couleur,next_couleur,15,15)
+    sun.draw()      
     while all_notes[note_number]<=realtime:
         result = gen.generate(testgrammar.Firework.Firework)
         style = result.children[1].children[0].value.name
