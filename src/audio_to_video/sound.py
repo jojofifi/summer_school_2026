@@ -17,7 +17,7 @@ class Sound:
     def startAnalyse(self, exportFilename) -> None:
         print("Analyse start :")
         cqt = CQT.getCQT(self.y, self.sr, self.hop_length)
-        CQT.exportCQT(cqt, self.sr, "/home/joseph/Downloads/Trumpet_CQT.png")
+        CQT.exportCQT(cqt, self.sr)
         print("\tCQT genereted")
         onset_times = Onset.detectOnset(self.y, self.sr)
         print("\tOnset detected")

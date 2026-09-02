@@ -55,7 +55,6 @@ class Tile:
 
         mountainCoords = ((coordinateStart[0] + (coordinateEnd[0] - coordinateStart[0]) * 0.1),coordinateStart[1])
         baseLength = math.ceil((coordinateEnd[0] - coordinateStart[0])*0.8)
-        print(noise)
         if self.type == "mountainTall":
             self.mountain = Mountain(4, 20, 10, baseLength, math.ceil((baseLength / 6)+(baseLength / 6)*noise), 20, 25, mountainCoords,self.screen)
         elif self.type == "mountainSmall":
