@@ -4,8 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Joseph Fiorina", email = "josephfiorina.nml@gmail.com" }]
-requires-python = ">=3.14"
-dependencies = ["pretty-midi>=0.2.11.post0"]
+requires-python = ">=3.12"
+dependencies = [
+    "opensimplex>=0.4.5.1",
+    "pretty-midi>=0.2.11.post0",
+    "pygame>=2.6.1",
+]
 
 [project.scripts]
 audio-to-video = "audio_to_video:main"

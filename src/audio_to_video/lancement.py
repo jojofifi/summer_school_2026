@@ -11,7 +11,7 @@ import random
 
 pygame.init()
 
-midi_path = "media/PinkPanther.midi"
+midi_path = "./src/audio_to_video/media/original_midi/PinkPanther.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 screen_height = 600
