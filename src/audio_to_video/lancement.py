@@ -11,7 +11,7 @@ import random
 
 pygame.init()
 
-midi_path = "./src/audio_to_video/media/original_midi/PinkPanther.midi"
+midi_path = "./media/original_midi/PinkPanther.midi"
 midi = pm.PrettyMIDI(midi_path)
 
 screen_height = 600
@@ -139,6 +139,7 @@ while run:
                             firework.ended_explosion,
                             firework.instrument,
                             random.uniform(1, 0.25),
+                            current_color,
                         )
                     )
             else:
@@ -153,6 +154,7 @@ while run:
                             firework.ended_explosion,
                             firework.instrument,
                             random.uniform(1, 0.75),
+                            current_color
                         )
                     )
             fireworks.remove(firework)
