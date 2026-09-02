@@ -4,18 +4,14 @@ import numpy as np
 
 
 class Note:
-    def __init__(
-        self, note_midi: int, start_time: float, end_time: float, instrument: str
-    ) -> None:
+    def __init__(self, note_midi: int, start_time: float, end_time: float, instrument: str) -> None:
         self.note_midi = note_midi
         self.start_time = start_time
         self.end_time = end_time
         self.instrument = instrument
 
     @staticmethod
-    def getNotes(
-        cqt, sound_onset, sr, hop_length: int, n_bins: int, bins_per_octave: int
-    ):
+    def getNotes(cqt, sound_onset, sr, hop_length: int, n_bins: int, bins_per_octave: int):
         notes = []
 
         for t in sound_onset:
@@ -24,18 +20,12 @@ class Note:
 
             max_values = Note.getMaxPowerNoteAtTime(7, cqt_slice)
 
-            clean_notes = Note.removeAlreadyPlayedNotes(
-                notes, Note.removeHarmony(cqt_slice, max_values, t_sec), t_sec
-            )
+            clean_notes = Note.removeAlreadyPlayedNotes(notes, Note.removeHarmony(cqt_slice, max_values, t_sec), t_sec)
 
             for note in clean_notes:
                 end_time = Note.getNoteEnd(cqt, sr, hop_length, t_sec, note)
-                instrument = Note.getInstrument(
-                    cqt, note, t_sec - 0.12, end_time, cqt_slice, sr, hop_length
-                )
-                notes.append(
-                    Note(Note.ajustOctave(note, 1), t_sec - 0.12, end_time, instrument)
-                )
+                instrument = Note.getInstrument(cqt, note, t_sec - 0.12, end_time, cqt_slice, sr, hop_length)
+                notes.append(Note(Note.ajustOctave(note, 1), t_sec - 0.12, end_time, instrument))
 
         return notes
 
@@ -73,9 +63,7 @@ class Note:
         piano_probability = 0
         trumpet_probability = 0
         frequency_ratio = Note.getInstrumentByHarmonicRatio(cqt_slice, note, 0.6)
-        power_stability = Note.getInstrumentByPowerStability(
-            cqt, note, start_time, end_time, sr, hop_length
-        )
+        power_stability = Note.getInstrumentByPowerStability(cqt, note, start_time, end_time, sr, hop_length)
         max_power = Note.getInstrumentByMaxPower(cqt_slice, note, 1.1)
 
         if frequency_ratio == "piano":
@@ -106,19 +94,13 @@ class Note:
     @staticmethod
     def getInstrumentByPowerStability(cqt, note, start_time, end_time, sr, hop_length):
         note_powers = []
-        start_time_frame = librosa.time_to_frames(
-            start_time, sr=sr, hop_length=hop_length
-        )
-        end_time_frame = librosa.time_to_frames(
-            start_time + 0.5, sr=sr, hop_length=hop_length
-        )
+        start_time_frame = librosa.time_to_frames(start_time, sr=sr, hop_length=hop_length)
+        end_time_frame = librosa.time_to_frames(start_time + 0.5, sr=sr, hop_length=hop_length)
         if end_time_frame >= cqt.shape[1]:
             end_time_frame = cqt.shape[1]
 
         if end_time - start_time < 0.5:
-            end_time_frame = librosa.time_to_frames(
-                end_time, sr=sr, hop_length=hop_length
-            )
+            end_time_frame = librosa.time_to_frames(end_time, sr=sr, hop_length=hop_length)
 
         for frame in range(start_time_frame, end_time_frame):
             cqt_slice = Note.getCqtAtFrame(cqt, frame)
@@ -165,9 +147,7 @@ class Note:
 
             total_low_frequencies_power = sum(low_frequencies_power)
             total_hight_frequencies_power = sum(hight_frequencies_power)
-            ratio = total_low_frequencies_power / (
-                total_low_frequencies_power + total_hight_frequencies_power
-            )
+            ratio = total_low_frequencies_power / (total_low_frequencies_power + total_hight_frequencies_power)
 
             if ratio < min_ratio_for_piano:
                 instrument = "trumpet"
@@ -221,10 +201,7 @@ class Note:
                     harmony = librosa.midi_to_hz(final_note) * i
                     note_hz = librosa.midi_to_hz(note)
 
-                    if (
-                        note_hz > harmony - harmony * 0.05
-                        and note_hz < harmony + harmony * 0.05
-                    ):
+                    if note_hz > harmony - harmony * 0.05 and note_hz < harmony + harmony * 0.05:
                         is_new_note = False
             if is_new_note:
                 final_notes.append(note)
@@ -251,19 +228,13 @@ class Note:
         hop_length: int,
         exportFilename: str = "/home/joseph/Downloads/exportTest.png",
     ) -> None:
-        # 1. Indice de la colonne correspondant au temps t
         cqt_times = librosa.times_like(cqt, sr=sr, hop_length=hop_length)
         col_idx = np.argmin(np.abs(cqt_times - t))
 
-        # 2. Récupérer l'amplitude à cet instant
         spectrum = np.abs(cqt[:, col_idx])
 
-        # 3. Générer les fréquences directement en Hz
-        freqs = librosa.cqt_frequencies(
-            n_bins=len(spectrum), fmin=librosa.note_to_hz("C1")
-        )
+        freqs = librosa.cqt_frequencies(n_bins=len(spectrum), fmin=librosa.note_to_hz("C1"))
 
-        # 4. Affichage simple (X: Hz, Y: Amplitude)
         plt.figure(figsize=(10, 4))
         plt.plot(freqs, spectrum)
         plt.xlabel("Fréquence (Hz)")
