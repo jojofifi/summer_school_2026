@@ -54,7 +54,7 @@ class Soleil():
             self.x += self.speedx*1/90
             self.y += self.speedy*1/90
             self.timer += 1/90
-        if self.timer >= self.time/4:
+        if self.timer >= self.time:
             self.end = True
     def draw(self):
         drawmethod.drawcircle(self.display,self.color,self.x,self.y,self.rayon,self.nbr_point)

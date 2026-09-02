@@ -75,8 +75,8 @@ class Frontend:
         combined = sorted(zip(all_notes, all_pitch))
         all_notes = [t for t, p in combined]
         all_pitch = [p for t, p in combined]
-        moon = object.sunandmoon.Lune(display, -50, 200, 3 * (duree_totale / 5))
-        sun = object.sunandmoon.Soleil(display, -50, 200, 2 * (duree_totale / 5))
+        moon = object.sunandmoon.Lune(display, -50, 200, 2 * (duree_totale / 4))
+        sun = object.sunandmoon.Soleil(display, -50, 200, 2 * (duree_totale / 4))
 
 
         START_COORDINATES = (0, screen_height / 2)
