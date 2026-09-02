@@ -88,6 +88,8 @@ class Frontend:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+            if realtime>=midi.get_end_time():
+                run = False
             step += 1
             if step < number_of_steps:
                 if index_couleur < nbr_transitions:
@@ -113,7 +115,7 @@ class Frontend:
                 drawmethod.draw_background(display, sun.x, sun.y, 1150, base_couleur, next_couleur, 6, 10)
             sun.draw()
 
-            while all_notes[note_number] <= realtime:
+            while note_number <= (len(all_notes)-1) and all_notes[note_number] <= realtime:
                 note_start = all_notes[note_number] + flight_time
                 result = gen.generate(fireworkgrammar.Firework.Firework)
                 style = result.children[1].children[0].value.name
@@ -170,7 +172,7 @@ class Frontend:
                 if explosion.end:
                     explosions.remove(explosion)
                     del explosion
-
+            
             pygame.display.update()
             clock.tick(FPS)
         pygame.quit
