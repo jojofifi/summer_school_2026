@@ -16,6 +16,7 @@ class Mountain:
         self.startCoordinates = startCoordinates
         self.screen = screen
         self.levels = []
+        self.arrColor = []
         Mountain.createMountain(self)
 
     def lineCreate(self, points:int, length:int, startCoordinates:tuple[float, float], lowPer:int):
@@ -64,27 +65,31 @@ class Mountain:
         topCoords = Mountain.lineCreate(self, points,int(baseLength-(baseLength*(sizeDiff/100))),topStartCoord,lowPerc)
         return bottomCoords, topCoords
 
-    def drawLevel(self, arrLow:list, arrHigh:list):
+    def drawLevel(self, arrLow:list, arrHigh:list, lvlCount:int):
         for i in range(0, len(arrHigh)-1):
             if i % 2 == 0:
-                newRGB = random.randint(0,100)
-                colorBackground = (37, newRGB, newRGB)
+                colorBackground = self.arrColor[lvlCount][i]
             else:
                 newRGB = random.randint(100, 200)
-                colorBackground = (37, newRGB, newRGB)
+                colorBackground = self.arrColor[lvlCount][i]
+
             pygame.draw.polygon(self.screen, colorBackground, (arrLow[i], arrHigh[i], arrHigh[i+1]))
             pygame.draw.polygon(self.screen, colorBackground, (arrLow[i], arrLow[i+1], arrHigh[i+1]))
+
             if i < len(arrHigh)-2:
                 colorBackground = (244, 233, 201)
                 pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], arrHigh[i+1], arrHigh[i+2]))
-        colorBackground = (0, 255, 0)
+
         diff = arrHigh[math.ceil(len(arrHigh)/2)][1] - arrHigh[0][1]
         pointYHigh = arrHigh[math.ceil(len(arrHigh)/2)][0], arrHigh[math.ceil(len(arrHigh)/2)][1]-diff*3
         pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], pointYHigh, arrHigh[len(arrHigh)-1]))
 
 
     def createMountain(self):
+        #first level
+
         self.levels.append(Mountain.levelCreate(self, self.points, self.baseLength, self.height, self.sizeDiff, self.lowPerc, self.startCoordinates))
+        self.arrColor.append(Mountain.levelColor(self, "green", self.points-1))
 
         for i in range(0, self.nbrLevels-1):
             newLength = self.levels[i][1][len(self.levels[i][1])-1][0]-self.levels[i][1][0][0]
@@ -92,10 +97,46 @@ class Mountain:
             newCoords = self.levels[i][1][0][0] + newLength * self.nextLvlSizeReduce / 2 / 100, self.levels[i][1][0][1]
 
             if i == self.nbrLevels -2:
+                #last level
                 self.levels.append(Mountain.levelCreate(self, 3, newLength, int(self.height/1.2), self.sizeDiff + 40, self.lowPerc-8, newCoords))
+                self.arrColor.append(Mountain.levelColor(self, "white", 3 - 1))
             else:
+                #other level
                 self.levels.append(Mountain.levelCreate(self, self.points, newLength, int(self.height + self.height * 0.2), self.sizeDiff + 15, self.lowPerc, newCoords))
+                self.arrColor.append(Mountain.levelColor(self, "gray", self.points-1))
+
+    def levelColor(self, color:str, numberOfColors:int):
+        arrRGB = []
+        for i in range(0, numberOfColors):
+            if(i % 2 == 0):
+                if(color == "green"):
+                    newRGB = random.randint(100, 125)
+                    arrRGB.append([100, newRGB, 0])
+                if(color == "gray"):
+                    newRGB = random.randint(150, 175)
+                    arrRGB.append([newRGB, newRGB, newRGB])
+                if(color == "white"):
+                    newRGB = random.randint(225, 250)
+                    arrRGB.append([newRGB, newRGB, newRGB])
+
+            if(i % 2 == 1):
+                if (color == "green"):
+                    newRGB = random.randint(50, 100)
+                    arrRGB.append([100, newRGB, 0])
+                if (color == "gray"):
+                    newRGB = random.randint(125, 150)
+                    arrRGB.append([newRGB, newRGB, newRGB])
+                if (color == "white"):
+                    newRGB = random.randint(200, 225)
+                    arrRGB.append([newRGB, newRGB, newRGB])
+
+        return arrRGB
+
+
+
 
     def drawMountain(self):
+        lvlCount = 0
         for level in self.levels:
-            Mountain.drawLevel(self, level[0], level[1])
+            Mountain.drawLevel(self, level[0], level[1], lvlCount)
+            lvlCount += 1
