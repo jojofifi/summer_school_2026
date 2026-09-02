@@ -7,8 +7,20 @@ import object.sunandmoon
 import object.fireworkgrammar as fireworkgrammar
 import pygame
 import random
+import hashlib
 
 class Frontend:
+    @staticmethod
+    def hashFile(file_path):
+        hash_func = hashlib.new('sha256')
+
+        with open(file_path, 'rb') as file:
+            #chunks of 8192 bytes
+            while chunk := file.read(8192):
+                hash_func.update(chunk)
+        #hashing
+        return hash_func.hexdigest()
+
     @staticmethod
     def start(midi_path, mp3_path):
         pygame.init()
@@ -81,7 +93,9 @@ class Frontend:
 
         START_COORDINATES = (0, screen_height / 2)
         tiles = Tiles(START_COORDINATES, display, screen_height, screen_width, 125)
-        mapTile = tiles.createTiles(45, 3)
+        seed = Frontend.hashFile(mp3_path)
+        print(seed)
+        mapTile = tiles.createTiles(int(seed,16), 3)
 
         while run:
             realtime = pygame.mixer.music.get_pos() / 1000
