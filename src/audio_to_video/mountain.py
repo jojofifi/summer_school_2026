@@ -79,7 +79,7 @@ class Mountain:
             if i < len(arrHigh)-2:
                 colorBackground = (244, 233, 201)
                 pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], arrHigh[i+1], arrHigh[i+2]))
-
+        colorBackground = (244, 233, 201)
         diff = arrHigh[math.ceil(len(arrHigh)/2)][1] - arrHigh[0][1]
         pointYHigh = arrHigh[math.ceil(len(arrHigh)/2)][0], arrHigh[math.ceil(len(arrHigh)/2)][1]-diff*3
         pygame.draw.polygon(self.screen, colorBackground, (arrHigh[0], pointYHigh, arrHigh[len(arrHigh)-1]))

@@ -79,7 +79,7 @@ sun = object.sunandmoon.Soleil(display, -50, 200, 2 * (duree_totale / 5))
 
 
 START_COORDINATES = (0, screen_height / 2)
-tiles = Tiles(START_COORDINATES, display, screen_height, screen_width, 130)
+tiles = Tiles(START_COORDINATES, display, screen_height, screen_width, 125)
 mapTile = tiles.createTiles(45, 3)
 
 while run:
